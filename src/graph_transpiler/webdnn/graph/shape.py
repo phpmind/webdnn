@@ -7,20 +7,20 @@ from webdnn.graph.place_holder import PlaceHolder
 class Shape:
     @staticmethod
     def parse(text: str) -> Tuple[List[Union[int, PlaceHolder]], Dict[str, PlaceHolder]]:
-
-        try:
-            tmp = ast.literal_eval(text.replace('_', 'None'))
-
-        except ValueError:
-            raise ValueError(f"Invalid shape format: '{text}'")
-
+        tmp = ast.literal_eval(text)
         shape = []
         placeholders = {}
-        for i, t in enumerate(tmp):
-            if t is None:
-                t = PlaceHolder()
-                placeholders["p" + str(i)] = t
+        for t in tmp:
+            if isinstance(t, str):
+                pt = PlaceHolder(label=t)
+                placeholders[t] = pt
 
-            shape.append(t)
+            elif isinstance(t, int):
+                pt = t
+
+            else:
+                raise ValueError(f"Invalid shape format: '{text}'")
+
+            shape.append(pt)
 
         return shape, placeholders
